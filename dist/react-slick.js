@@ -276,6 +276,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	  },
 	  onWindowResized: function onWindowResized() {
 	    this.update(this.props);
+	    this.state.animating = false;
+	    this.autoPlay();
+	  },
+	  localChangeSlide: function localChangeSlide(e) {
+	    this.changeSlide(e);
+	    this.setState({ totalMilLeft: 0 });
 	  },
 	  render: function render() {
 	    var className = (0, _classnames2['default'])('slick-initialized', 'slick-slider', this.props.className);
@@ -306,7 +312,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        slidesToShow: this.props.slidesToShow,
 	        currentSlide: this.state.currentSlide,
 	        slidesToScroll: this.props.slidesToScroll,
-	        clickHandler: this.changeSlide
+	        clickHandler: this.localChangeSlide
 	      };
 
 	      dots = _react2['default'].createElement(_dots.Dots, dotProps);
@@ -322,13 +328,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	      slidesToShow: this.props.slidesToShow,
 	      prevArrow: this.props.prevArrow,
 	      nextArrow: this.props.nextArrow,
-	      clickHandler: this.changeSlide
+	      clickHandler: this.localChangeSlide
 	    };
 
 	    if (this.props.arrows) {
 	      prevArrow = _react2['default'].createElement(_arrows.PrevArrow, arrowProps);
 	      nextArrow = _react2['default'].createElement(_arrows.NextArrow, arrowProps);
 	    }
+
+	    // console.log(this.state.autoPlayTimer);
+	    var progressPercentage = { width: this.state.progress + '%', 'background': 'green', 'height': '100%' };
 
 	    return _react2['default'].createElement(
 	      'div',
@@ -354,7 +363,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	      ),
 	      prevArrow,
 	      nextArrow,
-	      dots
+	      dots,
+	      _react2['default'].createElement(
+	        'div',
+	        { style: { height: '10px' }, className: 'progress' },
+	        _react2['default'].createElement('div', { style: progressPercentage, className: 'bar' })
+	      )
 	    );
 	  }
 	});
@@ -979,6 +993,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  autoPlay: function autoPlay() {
 	    var _this2 = this;
 
+	    var total = 0;
+	    var checkInterval = 50;
+
 	    if (this.state.autoPlayTimer) {
 	      return;
 	    }
@@ -988,15 +1005,39 @@ return /******/ (function(modules) { // webpackBootstrap
 	        _this2.slideHandler(nextIndex);
 	      }
 	    };
-	    if (this.props.autoplay) {
+	    var logTimer = function logTimer() {
+	      if (_this2.state.autoPlayTimer) {
+	        _this2.state.totalMilLeft += checkInterval;
+	      }
+	      var progress = _this2.state.totalMilLeft / _this2.props.autoplaySpeed * 100;
+	      _this2.setState({ progress: progress });
+	      console.log(_this2.state, 'timer triggered');
+
+	      if (progress >= 100) {
+	        play();
+	        _this2.setState({ progress: 0, totalMilLeft: 0 });
+	      }
+	    };
+	    if (this.props.autoplay && typeof this.state.checkTimer === 'undefined') {
 	      this.setState({
-	        autoPlayTimer: window.setInterval(play, this.props.autoplaySpeed)
+	        checkTimer: window.setInterval(logTimer, checkInterval),
+	        autoPlayTimer: window.setInterval(function () {}, this.props.autoplaySpeed)
+	      });
+	    } else {
+	      console.log(this.state.checkTimer);
+	      this.setState({
+	        autoPlayTimer: window.setInterval(function () {}, this.props.autoplaySpeed)
 	      });
 	    }
 	  },
+	  resetTimer: function resetTimer() {
+	    console.log('change slide');
+	  },
 	  pause: function pause() {
+	    console.log('pause');
 	    if (this.state.autoPlayTimer) {
 	      window.clearInterval(this.state.autoPlayTimer);
+	      //window.clearInterval(this.state.checkTimer);
 	      this.setState({
 	        autoPlayTimer: null
 	      });
@@ -1213,6 +1254,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // loadIndex: 0,
 	    slideCount: null,
 	    slideWidth: null,
+	    totalMilLeft: 0,
 	    // sliding: false,
 	    // slideOffset: 0,
 	    swipeLeft: null,

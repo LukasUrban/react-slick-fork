@@ -162,7 +162,7 @@ export var InnerSlider = React.createClass({
         {dots}
 
 
-        <div style={{height:'10px'}} className="progress">
+        <div className="progress">
           <div style={progressPercentage} className="bar"></div>
         </div>
         

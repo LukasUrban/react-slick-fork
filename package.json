@@ -1,5 +1,5 @@
 {
-  "name": "react-slick",
+  "name": "react-slick-fork",
   "version": "0.12.1",
   "description": " React port of slick carousel",
   "main": "./lib",
@@ -12,7 +12,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/akiran/react-slick"
+    "url": "https://github.com/LukasUrban/react-slick-fork"
   },
   "keywords": [
     "slick",
